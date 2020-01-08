@@ -1,0 +1,17 @@
+{
+  "name": "node_project",
+  "version": "1.0.0",
+  "description": "practicing node",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"node app.js",
+    "start:dev":"nodemon app.js"
+  },
+  "author": "Mukul Kumra",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.19.3"
+  }
+}
+  
