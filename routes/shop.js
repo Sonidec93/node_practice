@@ -6,9 +6,15 @@ const admin = require('./admin');
 
 
 router.get("/", (req, res, next) => {
-    res.render('shop', { products: admin.products, docTitle: 'Shop' })
-    // res.status(200).sendFile(path.join(rootDir, 'views', "shop.html"));
+    res.render('shop', {
+            hasProducts:admin.products.length>0,
+            products: admin.products,
+            docTitle: 'Shop',
+            productCss:true,
+            activeShop:true
+        })
+        // res.status(200).sendFile(path.join(rootDir, 'views', "shop.html"));
 })
 
 
-module.exports = router;
+module.exports = router; 
