@@ -8,7 +8,7 @@ var adminRoutes = require("./routes/admin");
 var shopRoutes = require("./routes/shop");
 var app = express(); //middleware
 var expressHbs = require('express-handlebars');
-
+var handle404 = require('./controller/404');
 
 app.use(
     bodyParser.urlencoded({
@@ -19,14 +19,10 @@ app.use(
 app.set("view engine", "ejs"); //it tells the express engine to use the specified engine for templating
 app.set("views", "ejs"); //specifies where are the templates present by default these are stored in 'views' folders
 app.use(express.static(path.join(__dirname, "static")));
-app.use("/admin", adminRoutes.router);
+app.use("/admin", adminRoutes);
 app.use("/shop", shopRoutes);
 
-app.use("*", (req, res, next) => {
-    res.status(404).render("404", {
-        docTitle: "Page Not Found!"
-    });
-});
+app.use("*", handle404);
 app.listen(9000).on("listening", () => {
     console.log("listening on port 9000");
 }); 
