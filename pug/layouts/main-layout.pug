@@ -5,7 +5,7 @@ head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     meta(http-equiv="X-UA-Compatible" content="ie=edge")
-    title #{docTitle}
+    title #{pageTitle}
     link(rel="stylesheet" href="/css/main.css")
     block styles
 body
@@ -13,7 +13,7 @@ body
         nav.main-header__nav
             ul.main-header__item-list
                 li.main-header__item
-                    a(class=(docTitle=='Shop'?'active':'') href="/shop") Shop
+                    a(class=(pageTitle=='Shop'?'active':'') href="/shop") Shop
                 li.main-header__item
-                    a(href="/admin/add-product" class=(docTitle=='Add Product'?'active':'')) Add Product
+                    a(href="/admin/add-product" class=(pageTitle=='Add Product'?'active':'')) Add Product
     block content

@@ -12,13 +12,20 @@ function fetchProducts(cb) {
     });
 }
 
+
 module.exports = class Product {
-    constructor(title) {
+    constructor(title, imageUrl, description, price) {
         this.title = title;
+        this.imageUrl = imageUrl;
+        this.description = description;
+        this.price = price;
+        this.id = null;
+
     }
 
     saveProduct() {
         fetchProducts((products) => {
+            this.id = Math.random().toString()
             products.push(this);
             fs.writeFile(pathToProduct, JSON.stringify(products), err => {
                 console.log(err);
@@ -28,8 +35,15 @@ module.exports = class Product {
     }
 
     static fetchAll(cb) {
-        fetchProducts(products=>{
+        fetchProducts(products => {
             cb(products);
+        })
+    }
+    static findProductById(id, cb) {
+        fetchProducts(products => {
+            let product = products.find(p => p.id === +id);
+            product ? cb(product) : cb(null);
+
         })
     }
 
