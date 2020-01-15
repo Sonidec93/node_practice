@@ -12,7 +12,7 @@ var handle404 = require('./controller/404');
 
 app.use(
     bodyParser.urlencoded({
-        extended: true
+        extended: false
     })
 );
 // app.engine("hbs", expressHbs({ layoutsDir: 'hbs/layouts', defaultLayout: 'main-layout', extname: 'hbs' }));
