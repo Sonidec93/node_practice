@@ -192,6 +192,18 @@ form {
   background-color: #00695c;
   color: white;
 }
+.centered{
+  text-align: center;
+}
+.product-detail__img--centered{
+  width:200px;
+  margin:auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.product-detail__img--centered img{
+  width:100%;
+}
 
 @media (min-width: 768px) {
   .main-header__nav {

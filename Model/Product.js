@@ -1,17 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const rootDir = require('../helper');
-const pathToProduct = path.join(rootDir, 'data', 'products.json');
-
-function fetchProducts(cb) {
-    fs.readFile(pathToProduct, (err, fileContent) => {
-        if (err) {
-            return cb([]);
-        }
-        return cb(JSON.parse(fileContent));
-    });
-}
-
+const helper = require('../helper');
+const pathToProduct = path.join(helper.rootDir, 'data', 'products.json');
 
 module.exports = class Product {
     constructor(title, imageUrl, description, price) {
@@ -24,7 +14,7 @@ module.exports = class Product {
     }
 
     saveProduct() {
-        fetchProducts((products) => {
+        helper.fetchProducts(pathToProduct, (products) => {
             this.id = Math.random().toString()
             products.push(this);
             fs.writeFile(pathToProduct, JSON.stringify(products), err => {
@@ -35,13 +25,13 @@ module.exports = class Product {
     }
 
     static fetchAll(cb) {
-        fetchProducts(products => {
+        helper.fetchProducts(pathToProduct, products => {
             cb(products);
         })
     }
     static findProductById(id, cb) {
-        fetchProducts(products => {
-            let product = products.find(p => p.id === +id);
+        helper.fetchProducts(pathToProduct, products => {
+            let product = products.find(p => p.id === id);
             product ? cb(product) : cb(null);
 
         })
