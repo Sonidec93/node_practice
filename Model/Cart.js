@@ -4,16 +4,17 @@ const helper = require('../helper');
 const pathToCartJson = path.join(helper.rootDir, 'data', 'cart.json');
 
 
-exports.Cart = class Cart {
+function getProductIndex(products, product) {
+    let existingProduct = products.find(prod => prod.id === product.id);
+    let prodIndex = products.findIndex(prod => prod.id === product.id);
+    return [existingProduct, prodIndex];
+}
+
+module.exports = class Cart {
     static save(product, cb) {
-        fs.readFile(pathToCartJson, (err, fileContent) => {
-            let cart = { products: [], totalPrice: 0 };
-            let newProduct = {};
-            if (!err) {
-                cart = JSON.parse(fileContent);
-            }
-            let existingProduct = cart.products.find(prod => prod.id === product.id);
-            let prodIndex = cart.products.findIndex(prod => prod.id === product.id);
+        helper.fetchProducts(pathToCartJson, (data) => {
+            let cart = data;
+            let [existingProduct, prodIndex] = getProductIndex(cart.products, product);
             let updatedProduct = {};
             if (existingProduct) {
                 updatedProduct = { ...existingProduct };
@@ -32,6 +33,26 @@ exports.Cart = class Cart {
                 cb();
             })
 
-        })
+        }, 'cart')
+
+    }
+    static removeFromCart(product, cb) {
+        helper.fetchProducts(pathToCartJson, (data) => {
+            let cart = data;
+            let [existingProduct, prodIndex] = getProductIndex(cart.products, product);
+            if (existingProduct) {
+                let priceTobeDeducted = product.price * existingProduct.qty;
+                cart.totalPrice == cart.totalPrice - priceTobeDeducted;
+                cart.products.splice(prodIndex,1)
+                fs.writeFile(pathToCartJson, JSON.stringify(cart), (err) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    cb();
+                });
+            }
+
+        }, 'cart')
+
     }
 }
