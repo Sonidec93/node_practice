@@ -18,8 +18,10 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const id = req.body.productId;
-  new Product(title, imageUrl, description, price, id).saveProduct();
-  res.redirect('/');
+  new Product(title, imageUrl, description, price, id).saveProduct(id,()=>{
+    res.status(302).redirect('/admin/products');
+
+  });
 };
 
 exports.getProducts = (req, res, next) => {
@@ -32,10 +34,10 @@ exports.getProducts = (req, res, next) => {
   });
 };
 exports.removeProduct = (req, res, next) => {
-  Product.findProductById(req.query.id, (product) => {
+  Product.findProductById(req.body.prodId, (product) => {
     Cart.removeFromCart(product, () => {
-      Product.deleteProduct(req.query.id, () => {
-        res.redirect('/');
+      Product.deleteProduct(req.body.prodId, () => {
+        return res.redirect('/');
       });
     })
   })
@@ -44,4 +46,4 @@ exports.editProduct = (req, res, next) => {
   Product.findProductById(req.params.productId, (product) => {
     res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: '/admin/products' })
   })
-}
+} 

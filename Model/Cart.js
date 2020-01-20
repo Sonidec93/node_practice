@@ -41,8 +41,8 @@ module.exports = class Cart {
             let cart = data;
             let [existingProduct, prodIndex] = getProductIndex(cart.products, product);
             if (existingProduct) {
-                let priceTobeDeducted = product.price * existingProduct.qty;
-                cart.totalPrice == cart.totalPrice - priceTobeDeducted;
+                let priceTobeDeducted = +product.price * existingProduct.qty;
+                cart.totalPrice = cart.totalPrice - priceTobeDeducted;
                 cart.products.splice(prodIndex,1)
                 fs.writeFile(pathToCartJson, JSON.stringify(cart), (err) => {
                     if (err) {
@@ -50,6 +50,9 @@ module.exports = class Cart {
                     }
                     cb();
                 });
+            }
+            else{
+                cb();
             }
 
         }, 'cart')

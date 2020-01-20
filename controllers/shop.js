@@ -28,7 +28,7 @@ exports.getCart = (req, res, next) => {
 };
 exports.addToCart = (req, res, next) => {
   Product.findProductById(req.body.productId, product => {
-    cart.Cart.save(product, () => {
+    cart.save(product, () => {
       console.log('succeeded');
     })
   })

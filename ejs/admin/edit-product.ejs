@@ -24,9 +24,9 @@
                 <label for="description">Description</label>
                 <textarea name="description" id="description" rows="5"><%=product.description%></textarea>
             </div>
-            <input type="hidden" name="productId" value="<%=product.productId%>">
+            <input type="hidden" name="productId" value="<%=product.id%>">
             <button class="btn" type="submit">Save Product</button>
-            <a class="btn" type="submit" href="/admin/products">Cancel</a>
+            <a class="btn" type="button" href="/admin/products">Cancel</a>
         </form>
     </main>
     <%- include('../includes/end.ejs') %>

@@ -14,17 +14,23 @@ module.exports = class Product {
 
     }
 
-    saveProduct(id) {
+    saveProduct(id, cb) {
         helper.fetchProducts(pathToProduct, (products) => {
             if (id) {
-                let productToBeEdited = products.findIndex(x => x.id == id);
+                let productToBeEdited = products.find(x => x.id == id);
+                let prodIndex = products.findIndex(x => x.id == id);
                 productToBeEdited = { ...this };
+                products.splice(prodIndex, 1, productToBeEdited)
+
             } else {
                 products.push(this);
             }
 
             fs.writeFile(pathToProduct, JSON.stringify(products), err => {
-                console.log(err);
+                if (err)
+                    console.log(err);
+                cb();
+
             });
         })
 

@@ -6,7 +6,7 @@ exports.rootDir = path.dirname(process.mainModule.filename);
 
 exports.fetchProducts = (path, cb, type = 'product') => {
     fs.readFile(path, (err, fileContent) => {
-        if (err) {
+        if (err || fileContent.length == 0) {
             if (type == 'product')
                 return cb([]);
             else
