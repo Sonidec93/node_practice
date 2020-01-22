@@ -12,7 +12,7 @@ function getProductIndex(products, product) {
 
 module.exports = class Cart {
     static save(product, cb) {
-        helper.fetchProducts(pathToCartJson, (data) => {
+        helper.fetchProducts(pathToCartJson, (data) => {    
             let cart = data;
             let [existingProduct, prodIndex] = getProductIndex(cart.products, product);
             let updatedProduct = {};
@@ -22,7 +22,7 @@ module.exports = class Cart {
                 cart.products.splice(prodIndex, 1, updatedProduct);
             }
             else {
-                updatedProduct = { id: product.id, qty: 1 };
+                updatedProduct = { id: product.id, title: product.title, qty: 1 };
                 cart.products.push(updatedProduct);
             }
             cart.totalPrice += +product.price;
@@ -30,7 +30,7 @@ module.exports = class Cart {
                 if (err) {
                     console.log(err);
                 }
-                cb();
+                cb(cart);
             })
 
         }, 'cart')
@@ -43,19 +43,24 @@ module.exports = class Cart {
             if (existingProduct) {
                 let priceTobeDeducted = +product.price * existingProduct.qty;
                 cart.totalPrice = cart.totalPrice - priceTobeDeducted;
-                cart.products.splice(prodIndex,1)
+                cart.products.splice(prodIndex, 1)
                 fs.writeFile(pathToCartJson, JSON.stringify(cart), (err) => {
                     if (err) {
                         console.log(err);
                     }
-                    cb();
+                    cb(cart);
                 });
             }
-            else{
+            else {
                 cb();
             }
 
         }, 'cart')
 
+    }
+    static getCart(cb) {
+        helper.fetchProducts(pathToCartJson, (data) => {
+            cb(data);
+        }, 'cart')
     }
 }
