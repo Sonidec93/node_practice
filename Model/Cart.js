@@ -5,8 +5,8 @@ const pathToCartJson = path.join(helper.rootDir, 'data', 'cart.json');
 
 
 function getProductIndex(products, product) {
-    let existingProduct = products.find(prod => prod.id === product.id);
-    let prodIndex = products.findIndex(prod => prod.id === product.id);
+    let existingProduct = products.find(prod => +prod.id === +product.id);
+    let prodIndex = products.findIndex(prod => +prod.id === +product.id);
     return [existingProduct, prodIndex];
 }
 
@@ -22,7 +22,7 @@ module.exports = class Cart {
                 cart.products.splice(prodIndex, 1, updatedProduct);
             }
             else {
-                updatedProduct = { id: product.id, title: product.title, qty: 1 };
+                updatedProduct = { id: +product.id, title: product.title, qty: 1 };
                 cart.products.push(updatedProduct);
             }
             cart.totalPrice += +product.price;
