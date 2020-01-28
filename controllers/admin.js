@@ -22,8 +22,21 @@ exports.postAddProduct = (req, res, next) => {
   //   res.status(302).redirect('/admin/products');
 
   // });
-  new Product(title, imageUrl, description, price, id).saveProduct(id).then((result) => {
-    res.status(302).redirect('/products');
+  // new Product(title, imageUrl, description, price, id).saveProduct(id).then((result) => {
+  //   res.status(302).redirect('/products');
+  // })
+
+  Product.create({
+    title:title,
+    imageUrl:imageUrl,
+    price:price,
+    description:description,
+  }).then(result=>{
+    console.log(result);
+    
+  }).catch(err=>{
+    console.log(err);
+    
   })
 };
 

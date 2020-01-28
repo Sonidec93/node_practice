@@ -10,6 +10,8 @@ var app = express(); //middleware
 var expressHbs = require('express-handlebars');
 var handle404 = require('./controllers/error');
 
+const sequelize = require('./database');
+
 app.use(
     bodyParser.urlencoded({
         extended: false
@@ -23,6 +25,12 @@ app.use("/admin", adminRoutes);
 app.use("/", shopRoutes);
 
 app.use("*", handle404.get404);
-app.listen(9000).on("listening", () => {
-    console.log("listening on port 9000");
-}); 
+sequelize.sync().then(result => {
+    console.log(result);
+    app.listen(9000).on("listening", () => {
+        console.log("listening on port 9000");
+    });
+}).catch(err => {
+    console.log(err);
+})
+
