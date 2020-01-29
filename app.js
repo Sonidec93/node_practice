@@ -9,7 +9,8 @@ var shopRoutes = require("./routes/shop");
 var app = express(); //middleware
 var expressHbs = require('express-handlebars');
 var handle404 = require('./controllers/error');
-
+const product = require('./Model/Product');
+const user = require('./Model/User');
 const sequelize = require('./database');
 
 app.use(
@@ -21,11 +22,32 @@ app.use(
 app.set("view engine", "ejs"); //it tells the express engine to use the specified engine for templating
 app.set("views", "ejs"); //specifies where are the templates present by default these are stored in 'views' folders
 app.use(express.static(path.resolve(__dirname, "static")));
+app.use((req, res, next) => {
+    user.findByPk(1).then(User => {
+        req.user = User
+        next();
+    }).catch(err => {
+        console.log('error occured while fetching the user', err);
+    })
+})
 app.use("/admin", adminRoutes);
 app.use("/", shopRoutes);
 
 app.use("*", handle404.get404);
-sequelize.sync().then(result => {
+
+product.belongsTo(user, { constraints: true, onDelete: 'CASCADE' })
+user.hasMany(product);//here user is in respect to the user who adds product
+
+sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
+    user.findByPk(1).then(User => {
+        if (!User) {
+            return user.create({ name: 'mukul', email: 'mukul.kumra@gmail.com' });
+        }
+        return User;
+    }).then(user => {
+        console.log('user created')
+        console.log(user);
+    })
     console.log(result);
     app.listen(9000).on("listening", () => {
         console.log("listening on port 9000");
