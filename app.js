@@ -12,6 +12,8 @@ var handle404 = require('./controllers/error');
 const product = require('./Model/Product');
 const user = require('./Model/User');
 const sequelize = require('./database');
+const cart = require('./Model/Cart');
+const cartItem = require('./Model/Cart-Item');
 
 app.use(
     bodyParser.urlencoded({
@@ -24,7 +26,7 @@ app.set("views", "ejs"); //specifies where are the templates present by default 
 app.use(express.static(path.resolve(__dirname, "static")));
 app.use((req, res, next) => {
     user.findByPk(1).then(User => {
-        req.user = User
+        req.user = User;
         next();
     }).catch(err => {
         console.log('error occured while fetching the user', err);
@@ -37,21 +39,29 @@ app.use("*", handle404.get404);
 
 product.belongsTo(user, { constraints: true, onDelete: 'CASCADE' })
 user.hasMany(product);//here user is in respect to the user who adds product
+user.hasOne(cart);
+cart.belongsTo(user);
+cart.belongsToMany(product, { through: cartItem });
+product.belongsToMany(cart, { through: cartItem });
 
-sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
+
+
+sequelize.sync({force:true}).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
     user.findByPk(1).then(User => {
         if (!User) {
             return user.create({ name: 'mukul', email: 'mukul.kumra@gmail.com' });
         }
         return User;
     }).then(user => {
-        console.log('user created')
-        console.log(user);
+        return user.createCart();
+
+    }).then(result => {
+        app.listen(9000).on("listening", () => {
+            console.log("listening on port 9000");
+        });
     })
-    console.log(result);
-    app.listen(9000).on("listening", () => {
-        console.log("listening on port 9000");
-    });
+
+
 }).catch(err => {
     console.log(err);
 })

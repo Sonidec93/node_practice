@@ -14,12 +14,12 @@ exports.getAddProduct = (req, res, next) => {
   });
 };
 
-exports.postAddProduct = (req, res, next) => {
-  console.log('in admin with user logged in', req.user);
+exports.postAddProduct = async (req, res, next) => {
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
+  const userId = req.user.id;
   const id = +req.body.productId;
   // new Product(title, imageUrl, description, price, id).saveProduct(id,()=>{
   //   res.status(302).redirect('/admin/products');
@@ -42,11 +42,12 @@ exports.postAddProduct = (req, res, next) => {
     //   console.log(err);
     // })
     //above approach also works
-    Product.update({
+   await  Product.update({
       title: title,
       imageUrl: imageUrl,
       price: price,
       description: description,
+      UserId: userId
     }, {
       where: { id: id }
     }).then(result => {
@@ -54,19 +55,21 @@ exports.postAddProduct = (req, res, next) => {
     })
   }
   else {
-    Product.create({
+    await Product.create({
       title: title,
       imageUrl: imageUrl,
       price: price,
       description: description,
+      UserId: userId
     }).then(result => {
       console.log(result);
-      res.status(302).redirect('/admin/products');
+      
     }).catch(err => {
       console.log(err);
 
     })
   }
+  res.status(302).redirect('/admin/products');
 
 };
 
@@ -86,7 +89,8 @@ exports.getProducts = (req, res, next) => {
   //     path: '/admin/products'
   //   })
   // });
-  Product.findAll().then(products => {
+  console.log(req.user);
+  Product.findAll({ where: { UserId: req.user.id } }).then(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
