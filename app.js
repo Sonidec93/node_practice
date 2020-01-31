@@ -46,7 +46,7 @@ product.belongsToMany(cart, { through: cartItem });
 
 
 
-sequelize.sync({force:true}).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
+sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
     user.findByPk(1).then(User => {
         if (!User) {
             return user.create({ name: 'mukul', email: 'mukul.kumra@gmail.com' });
