@@ -68,7 +68,7 @@ exports.getCart = (req, res, next) => {
         path: '/cart',
         pageTitle: 'Your Cart',
         products: products,
-        totalPrice: products.reduce((sum, product) => sum + product.price, 0)
+        totalPrice: products.reduce((sum, product) => sum + product.price * product.CartItem.quantity, 0)
       });
     })
   });
@@ -86,13 +86,13 @@ exports.removeFromCart = (req, res, next) => {
   //     });
   //   })
   // })
-  
-  req.user.getCart().then(cart=>{
+
+  req.user.getCart().then(cart => {
     cart.getProducts({ where: { id: +req.body.productId } }).then(products => {
-    cart.removeProduct(products[0]);
-    res.redirect('/cart')
-  })
-});
+      cart.removeProduct(products[0]);
+      res.redirect('/cart')
+    })
+  });
 }
 exports.addToCart = (req, res, next) => {
   // Product.findProductById(req.body.productId, product => {
@@ -100,7 +100,7 @@ exports.addToCart = (req, res, next) => {
   //     res.render('shop/cart', {
   //       path: '/cart',
   //       pageTitle: 'Your Cart',
-  //       products: cartData.products,
+  //       products: cartData.products,         
   //       totalPrice: cartData.totalPrice
   //     });
   //   })
@@ -113,7 +113,9 @@ exports.addToCart = (req, res, next) => {
         var product = products[0];
       }
       if (product) {
-        //
+        //changing the quantity
+        var new_quantity = ++(product.CartItem.quantity);
+        return cart.addProduct(product, { through: { quantity: new_quantity } });
       }
       else {
         return Product.findByPk(+req.body.productId).then(product => {
@@ -128,12 +130,12 @@ exports.addToCart = (req, res, next) => {
 
 }
 
-exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders'
-  });
-};
+// exports.getOrders = (req, res, next) => {
+//   res.render('shop/orders', {
+//     path: '/orders',
+//     pageTitle: 'Your Orders'
+//   });
+// };
 
 exports.getCheckout = (req, res, next) => {
   res.render('shop/checkout', {
@@ -149,5 +151,27 @@ exports.getProduct = (req, res, next) => {
     res.status(200).render('shop/product-detail', { product: product, path: '/products', pageTitle: 'Product Detail' });
 
   })
+
+}
+exports.createOrder = async (req, res, next) => {
+  // let fetchedCart;
+  let fetchedCart = await req.user.getCart();
+  let products = await fetchedCart.getProducts();
+  let order = await req.user.createOrder();
+  await order.addProducts(products.map(product => {
+    product.OrderItem = { quantity: product.CartItem.quantity }
+    return product;
+  }));
+  await fetchedCart.setProducts(null);
+  res.redirect('/cart');
+}
+exports.getOrders = async (req, res, next) => {
+
+  let orders = await req.user.getOrders({ include: ['products'] });
+  res.render('shop/orders', {
+    path: '/orders',
+    pageTitle: 'Orders',
+    orders: orders
+  });
 }
 

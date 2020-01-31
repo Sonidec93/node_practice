@@ -14,7 +14,8 @@ const user = require('./Model/User');
 const sequelize = require('./database');
 const cart = require('./Model/Cart');
 const cartItem = require('./Model/Cart-Item');
-
+const order = require('./Model/Order');
+const orderItem = require('./Model/Order-Item');
 app.use(
     bodyParser.urlencoded({
         extended: false
@@ -24,6 +25,7 @@ app.use(
 app.set("view engine", "ejs"); //it tells the express engine to use the specified engine for templating
 app.set("views", "ejs"); //specifies where are the templates present by default these are stored in 'views' folders
 app.use(express.static(path.resolve(__dirname, "static")));
+
 app.use((req, res, next) => {
     user.findByPk(1).then(User => {
         req.user = User;
@@ -43,10 +45,14 @@ user.hasOne(cart);
 cart.belongsTo(user);
 cart.belongsToMany(product, { through: cartItem });
 product.belongsToMany(cart, { through: cartItem });
+user.hasMany(order);
+order.belongsTo(user);
+order.belongsToMany(product, { through: orderItem });
 
 
 
-sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in 
+sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an option in development mode as we want to get that reflected in after making changes
+
     user.findByPk(1).then(User => {
         if (!User) {
             return user.create({ name: 'mukul', email: 'mukul.kumra@gmail.com' });
@@ -57,6 +63,7 @@ sequelize.sync({ force: true }).then(result => { //we can use {force:true} as an
 
     }).then(result => {
         app.listen(9000).on("listening", () => {
+            shopRoutes
             console.log("listening on port 9000");
         });
     })
