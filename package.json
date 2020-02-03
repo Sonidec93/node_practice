@@ -15,6 +15,7 @@
     "devDependencies": {
         "@types/sequelize": "^4.28.8",
         "eslint": "^6.7.2",
+        "mongodb": "^3.5.2",
         "nodemon": "^1.19.3"
     },
     "dependencies": {

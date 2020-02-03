@@ -19,8 +19,14 @@ exports.postAddProduct = async (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const userId = req.user.id;
-  const id = +req.body.productId;
+  // const userId = req.user.id;
+  // const id = +req.body.productId;
+
+  new Product(title, price, description, imageUrl).save().then(result => {
+    console.log(result)
+  }).catch(err => {
+    console.log(err);
+  })
   // new Product(title, imageUrl, description, price, id).saveProduct(id,()=>{
   //   res.status(302).redirect('/admin/products');
 
@@ -28,48 +34,48 @@ exports.postAddProduct = async (req, res, next) => {
   // new Product(title, imageUrl, description, price, id).saveProduct(id).then((result) => {
   //   res.status(302).redirect('/products');
   // })
-  if (id) {
-    // Product.findOne({ where: { id: id } }).then(product => {
-    //   product.update({
-    //     title: title,
-    //     imageUrl: imageUrl,
-    //     price: price,
-    //     description: description,
-    //   }).then(result => {
-    //     console.log('update succeeded');
-    //   })
-    // }).catch(err => {
-    //   console.log(err);
-    // })
-    //above approach also works
-   await  Product.update({
-      title: title,
-      imageUrl: imageUrl,
-      price: price,
-      description: description,
-      UserId: userId
-    }, {
-      where: { id: id }
-    }).then(result => {
-      console.log('update succeeded');
-    })
-  }
-  else {
-    await Product.create({
-      title: title,
-      imageUrl: imageUrl,
-      price: price,
-      description: description,
-      UserId: userId
-    }).then(result => {
-      console.log(result);
-      
-    }).catch(err => {
-      console.log(err);
+  // if (id) {
+  // Product.findOne({ where: { id: id } }).then(product => {
+  //   product.update({
+  //     title: title,
+  //     imageUrl: imageUrl,
+  //     price: price,
+  //     description: description,
+  //   }).then(result => {
+  //     console.log('update succeeded');
+  //   })
+  // }).catch(err => {
+  //   console.log(err);
+  // })
+  //above approach also works
+  //   await Product.update({
+  //     title: title,
+  //     imageUrl: imageUrl,
+  //     price: price,
+  //     description: description,
+  //     UserId: userId
+  //   }, {
+  //     where: { id: id }
+  //   }).then(result => {
+  //     console.log('update succeeded');
+  //   })
+  // }
+  // else {
+  //   await Product.create({
+  //     title: title,
+  //     imageUrl: imageUrl,
+  //     price: price,
+  //     description: description,
+  //     UserId: userId
+  //   }).then(result => {
+  //     console.log(result);
 
-    })
-  }
-  res.status(302).redirect('/admin/products');
+  //   }).catch(err => {
+  //     console.log(err);
+
+  //   })
+  // }
+  // res.status(302).redirect('/admin/products');
 
 };
 
