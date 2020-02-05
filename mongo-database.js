@@ -2,7 +2,7 @@ const mongoDB = require('mongodb');
 const mongoClient = mongoDB.MongoClient;
 
 let _db;
-
+console.log('in mongo db');
 const mongoConnect = cb => {
     mongoClient.connect('mongodb+srv://mukulkumra:dunston@123@cluster0-hln0c.mongodb.net/test?retryWrites=true&w=majority').then(client => {
         console.log('connected');

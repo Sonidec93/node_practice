@@ -20,10 +20,10 @@ exports.postAddProduct = async (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   // const userId = req.user.id;
-  // const id = +req.body.productId;
+  const id = req.body.productId;
 
-  new Product(title, price, description, imageUrl).save().then(result => {
-    console.log(result)
+  new Product(title, price, description, imageUrl, id).save().then(result => {
+    res.status(302).redirect('/admin/products');
   }).catch(err => {
     console.log(err);
   })
@@ -95,23 +95,38 @@ exports.getProducts = (req, res, next) => {
   //     path: '/admin/products'
   //   })
   // });
-  console.log(req.user);
-  Product.findAll({ where: { UserId: req.user.id } }).then(products => {
+
+  //sequelize
+  // console.log(req.user);
+  // Product.findAll({ where: { UserId: req.user.id } }).then(products => {
+  //   res.render('admin/products', {
+  //     prods: products,
+  //     pageTitle: 'Admin Products',
+  //     path: '/admin/products'
+  //   })
+  // })
+  //end
+
+  Product.fetchAll().then(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products'
     })
-  })
-
-};
-exports.removeProduct = (req, res, next) => {
-  Product.findOne({ where: { id: +req.body.prodId } }).then(product => {
-    return product.destroy();
-  }).then(result => {
-    console.log('product deleted');
-    res.status(302).redirect('/admin/products');
+  }).catch(err => {
+    console.log(err)
   });
+}
+exports.removeProduct = (req, res, next) => {
+  ////sequelize
+  // Product.findOne({ where: { id: +req.body.prodId } }).then(product => {
+  //   return product.destroy();
+  // }).then(result => {
+  //   console.log('product deleted');
+  //   res.status(302).redirect('/admin/products');
+  // });
+
+  ////end
   // Product.findProductById(req.body.prodId, (product) => {
   //   Cart.removeFromCart(product, () => {
   //     Product.deleteProduct(req.body.prodId, () => {
@@ -119,15 +134,35 @@ exports.removeProduct = (req, res, next) => {
   //     });
   //   })
   // })
+  console.log(req.body.prodId);
+  Product.deleteProduct(req.body.prodId).then(result => {
+    res.status(302).redirect('/admin/products');
+  })
 }
 exports.editProduct = (req, res, next) => {
   // Product.findProductById(req.params.productId, (product) => {
   //   res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: '/admin/products' })
   // })
-  Product.findByPk(+req.params.productId).then(product => {
+  ////sequelize
+  // Product.findByPk(+req.params.productId).then(product => {
+  //   res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: '/admin/products' })
+  // })
+  ////end
+
+  ////mong
+  // Product.findById(req.params.productId).then(([product, ...rest]) => {
+  Product.findById(req.params.productId).then(product => {
     res.render('admin/edit-product', { product: product, pageTitle: 'Edit Product', path: '/admin/products' })
+
+  }).catch(err => {
+    console.log(err);
   })
+
+  //end
+
+  ////mysql2
   // Product.findProductById(req.params.productId).then(([rows, fieldData]) => {
   //   res.render('admin/edit-product', { product: rows[0], pageTitle: 'Edit Product', path: '/admin/products' });
   // })
+  ////end
 } 
