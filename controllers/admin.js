@@ -21,8 +21,9 @@ exports.postAddProduct = async (req, res, next) => {
   const description = req.body.description;
   // const userId = req.user.id;
   const id = req.body.productId;
+  const userId = req.user._id;
 
-  new Product(title, price, description, imageUrl, id).save().then(result => {
+  new Product(title, price, description, imageUrl, id, userId).save().then(result => {
     res.status(302).redirect('/admin/products');
   }).catch(err => {
     console.log(err);
@@ -97,7 +98,7 @@ exports.getProducts = (req, res, next) => {
   // });
 
   //sequelize
-  // console.log(req.user);
+  console.log('user logged in', req.user);
   // Product.findAll({ where: { UserId: req.user.id } }).then(products => {
   //   res.render('admin/products', {
   //     prods: products,

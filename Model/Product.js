@@ -28,20 +28,24 @@ const MongoDb = require('mongodb');
 
 class Product {
 
-    constructor(title, price, description, imageUrl, id) {
+    constructor(title, price, description, imageUrl, id, userID) {
         this.title = title;
         this.price = price;
         this.description = description;
         this.imageUrl = imageUrl;
         this._id = id;
+        this.userId = userID;
     }
 
     save() {
         let db = mongo_db();
         if (this._id) {
-            return db.collection('product').updateOne({ _id: new MongoDb.ObjectId(this._id) }, { $set: {title:this.title,price:this.price,description:this.description,imageUrl:this.imageUrl} });
+            return db.collection('product').updateOne({ _id: new MongoDb.ObjectId(this._id) }, { $set: { title: this.title, price: this.price, description: this.description, imageUrl: this.imageUrl } });
         }
-        return db.collection('product').insertOne(this);
+        else {
+            return db.collection('product').insertOne({ title: this.title, price: this.price, description: this.description, imageUrl: this.imageUrl, userID: new MongoDb.ObjectId(this.userId) });
+
+        }
 
     }
 

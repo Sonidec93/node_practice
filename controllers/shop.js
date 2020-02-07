@@ -17,13 +17,27 @@ exports.getProducts = (req, res, next) => {
   //     path: '/products'
   //   })
   // })
-  Product.findAll().then(products => {
+
+
+  ////sequelize
+  // Product.findAll().then(products => {
+  //   res.render('shop/product-list', {
+  //     prods: products,
+  //     pageTitle: 'All Products',
+  //     path: '/products'
+  //   })
+  // })
+  ////end
+
+  ////mongo
+  Product.fetchAll().then(products => {
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
       path: '/products'
     })
   })
+  ////end
 };
 
 exports.getIndex = (req, res, next) => {
@@ -42,13 +56,26 @@ exports.getIndex = (req, res, next) => {
   //     path: '/'
   //   })
   // });
-  Product.findAll().then(products => {
-    res.render('shop/index', {
+  ////sequelize
+  // Product.findAll().then(products => {
+  //   res.render('shop/index', {
+  //     prods: products,
+  //     pageTitle: 'Shop',
+  //     path: '/'
+  //   })
+  // })
+
+  ////end
+
+  ////mongo
+  Product.fetchAll().then(products => {
+    res.render('shop/product-list', {
       prods: products,
-      pageTitle: 'Shop',
-      path: '/'
+      pageTitle: 'All Products',
+      path: '/products'
     })
   })
+  ////end
 };
 
 exports.getCart = (req, res, next) => {
@@ -60,18 +87,30 @@ exports.getCart = (req, res, next) => {
   //     totalPrice: cart.totalPrice
   //   });
   // })
+////sequelize
+  // req.user.getCart().then(cart => {
+  //   cart.getProducts().then(products => {
+  //     console.log(products);
+  //     res.render('shop/cart', {
+  //       path: '/cart',
+  //       pageTitle: 'Your Cart',
+  //       products: products,
+  //       totalPrice: products.reduce((sum, product) => sum + product.price * product.CartItem.quantity, 0)
+  //     });
+  //   })
+  // });
+  ////end
 
-  req.user.getCart().then(cart => {
-    cart.getProducts().then(products => {
-      console.log(products);
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: products,
-        totalPrice: products.reduce((sum, product) => sum + product.price * product.CartItem.quantity, 0)
-      });
-    })
-  });
+  ////mongo
+  req.user.getCart().then(products=>{
+    res.render('shop/cart', {
+            path: '/cart',
+            pageTitle: 'Your Cart',
+            products: products,
+            totalPrice: products.reduce((sum, product) => sum + product.price * product.quantity, 0)
+          });
+  })
+  ////end
 
 };
 
@@ -86,13 +125,18 @@ exports.removeFromCart = (req, res, next) => {
   //     });
   //   })
   // })
+  ////sequelize
+  // req.user.getCart().then(cart => {
+  //   cart.getProducts({ where: { id: +req.body.productId } }).then(products => {
+  //     cart.removeProduct(products[0]);
+  //     res.redirect('/cart')
+  //   })
+  // });
+  ////end
+////mongo
 
-  req.user.getCart().then(cart => {
-    cart.getProducts({ where: { id: +req.body.productId } }).then(products => {
-      cart.removeProduct(products[0]);
-      res.redirect('/cart')
-    })
-  });
+////end
+
 }
 exports.addToCart = (req, res, next) => {
   // Product.findProductById(req.body.productId, product => {
@@ -105,28 +149,37 @@ exports.addToCart = (req, res, next) => {
   //     });
   //   })
   // })
+  ////sequelize
+  // req.user.getCart().then(cart => {
+  //   cart.getProducts({ where: { id: +req.body.productId } }).then(products => {
 
-  req.user.getCart().then(cart => {
-    cart.getProducts({ where: { id: +req.body.productId } }).then(products => {
+  //     if (products.length > 0) {
+  //       var product = products[0];
+  //     }
+  //     if (product) {
+  //       //changing the quantity
+  //       var new_quantity = ++(product.CartItem.quantity);
+  //       return cart.addProduct(product, { through: { quantity: new_quantity } });
+  //     }
+  //     else {
+  //       return Product.findByPk(+req.body.productId).then(product => {
+  //         return cart.addProduct(product, { through: { quantity: 1 } });
+  //       })
+  //     }
 
-      if (products.length > 0) {
-        var product = products[0];
-      }
-      if (product) {
-        //changing the quantity
-        var new_quantity = ++(product.CartItem.quantity);
-        return cart.addProduct(product, { through: { quantity: new_quantity } });
-      }
-      else {
-        return Product.findByPk(+req.body.productId).then(product => {
-          return cart.addProduct(product, { through: { quantity: 1 } });
-        })
-      }
+  //   }).then(() => {
+  //     res.status(302).redirect('/cart');
+  //   })
+  // })
+  ////end
 
-    }).then(() => {
-      res.status(302).redirect('/cart');
-    })
+  ////Mongo
+  Product.findById(req.body.productId).then(product => {
+    req.user.addToCart(product).then(result => {
+      res.status(302).redirect('/');
+    });
   })
+  ////end
 
 }
 

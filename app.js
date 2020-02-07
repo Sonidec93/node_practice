@@ -11,7 +11,7 @@ var expressHbs = require('express-handlebars');
 var handle404 = require('./controllers/error');
 //Sequelize configuration and model
 // const product = require('./Model/Product');
-// const user = require('./Model/User');
+const user = require('./Model/User');
 // const sequelize = require('./database');
 // const cart = require('./Model/Cart');
 // const cartItem = require('./Model/Cart-Item');
@@ -32,14 +32,14 @@ app.set("view engine", "ejs"); //it tells the express engine to use the specifie
 app.set("views", "ejs"); //specifies where are the templates present by default these are stored in 'views' folders
 app.use(express.static(path.resolve(__dirname, "static")));
 
-// app.use((req, res, next) => {
-//     user.findByPk(1).then(User => {
-//         req.user = User;
-//         next();
-//     }).catch(err => {
-//         console.log('error occured while fetching the user', err);
-//     })
-// })
+app.use((req, res, next) => {
+    user.findById('5e3ba93765b51db1cdc05588').then(User => {
+        req.user = new user(User);
+        next();
+    }).catch(err => {
+        console.log('error occured while fetching the user', err);
+    })
+})
 app.use("/admin", adminRoutes);
 app.use("/", shopRoutes);
 
@@ -79,8 +79,7 @@ app.use("*", handle404.get404);
 //     console.log(err);
 // })
 
-MongoConfig(client => {
-    console.log(client);
+MongoConfig(() => {
     app.listen(9000).on('listening', () => {
         console.log('listening at port 9000');
     })

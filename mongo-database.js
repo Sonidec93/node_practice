@@ -5,10 +5,8 @@ let _db;
 console.log('in mongo db');
 const mongoConnect = cb => {
     mongoClient.connect('mongodb+srv://mukulkumra:dunston@123@cluster0-hln0c.mongodb.net/test?retryWrites=true&w=majority').then(client => {
-        console.log('connected');
-        cb();
         _db = client.db();
-        console.log('hello')
+        cb();
     }).catch(err => {
         console.log('error occured while connecting mongo db\n', err);
     })
