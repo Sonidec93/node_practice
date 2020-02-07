@@ -87,7 +87,7 @@ exports.getCart = (req, res, next) => {
   //     totalPrice: cart.totalPrice
   //   });
   // })
-////sequelize
+  ////sequelize
   // req.user.getCart().then(cart => {
   //   cart.getProducts().then(products => {
   //     console.log(products);
@@ -102,13 +102,13 @@ exports.getCart = (req, res, next) => {
   ////end
 
   ////mongo
-  req.user.getCart().then(products=>{
+  req.user.getCart().then(products => {
     res.render('shop/cart', {
-            path: '/cart',
-            pageTitle: 'Your Cart',
-            products: products,
-            totalPrice: products.reduce((sum, product) => sum + product.price * product.quantity, 0)
-          });
+      path: '/cart',
+      pageTitle: 'Your Cart',
+      products: products,
+      totalPrice: products.reduce((sum, product) => sum + product.price * product.quantity, 0)
+    });
   })
   ////end
 
@@ -133,9 +133,11 @@ exports.removeFromCart = (req, res, next) => {
   //   })
   // });
   ////end
-////mongo
-
-////end
+  ////mongo
+  req.user.removeFromCart(req.body.productId).then(result => {
+    res.status(302).redirect('/cart');
+  })
+  ////end
 
 }
 exports.addToCart = (req, res, next) => {
@@ -176,7 +178,7 @@ exports.addToCart = (req, res, next) => {
   ////Mongo
   Product.findById(req.body.productId).then(product => {
     req.user.addToCart(product).then(result => {
-      res.status(302).redirect('/');
+      res.status(302).redirect('/cart');
     });
   })
   ////end
@@ -208,23 +210,44 @@ exports.getProduct = (req, res, next) => {
 }
 exports.createOrder = async (req, res, next) => {
   // let fetchedCart;
-  let fetchedCart = await req.user.getCart();
-  let products = await fetchedCart.getProducts();
-  let order = await req.user.createOrder();
-  await order.addProducts(products.map(product => {
-    product.OrderItem = { quantity: product.CartItem.quantity }
-    return product;
-  }));
-  await fetchedCart.setProducts(null);
-  res.redirect('/cart');
+  ////sequelize
+  // let fetchedCart = await req.user.getCart();
+  // let products = await fetchedCart.getProducts();
+  // let order = await req.user.createOrder();
+  // await order.addProducts(products.map(product => {
+  //   product.OrderItem = { quantity: product.CartItem.quantity }
+  //   return product;
+  // }));
+  // await fetchedCart.setProducts(null);
+  // res.redirect('/cart');
+
+  ////end
+
+  ////mongo
+  req.user.createOrder().then(result => {
+    res.redirect('/cart');
+  })
+  ////end
+
 }
 exports.getOrders = async (req, res, next) => {
+  ////sequelize
+  // let orders = await req.user.getOrders({ include: ['products'] });
+  // res.render('shop/orders', {
+  //   path: '/orders',
+  //   pageTitle: 'Orders',
+  //   orders: orders
+  // });
+  ////end
 
-  let orders = await req.user.getOrders({ include: ['products'] });
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Orders',
-    orders: orders
-  });
+  ////mongo
+  req.user.getOrders().then(orders => {
+    res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Orders',
+      orders: orders
+    });
+  })
+  ////end
 }
 

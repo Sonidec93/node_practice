@@ -33,10 +33,19 @@ class User {
 
     addToCart(product) {
         let updatedCart;
-        if (this.cart) {
+        if (this.cart && this.cart.items.length > 0) {
+
+
             let itemIndex = this.cart.items.findIndex(x => x.productId.toString() === product._id.toString());
-            this.cart.items[itemIndex].quantity += 1;
             updatedCart = { ...this.cart };
+            if (itemIndex>=0) {
+            updatedCart.items[itemIndex].quantity += 1;
+
+            }
+            else {
+                updatedCart.items.push({ productId: new MongoDB.ObjectId(product._id), quantity: 1 });
+            }
+
         }
         else {
             updatedCart = { items: [{ productId: new MongoDB.ObjectId(product._id), quantity: 1 }] };
@@ -67,10 +76,46 @@ class User {
 
 
     }
+    createOrder() {
+        return db().collection('order').insertOne({ items: this.cart.items, userId: new MongoDB.ObjectID(this._id) }).then(result => {
+            this.cart = null;
+            return db().collection('user').updateOne({ _id: new MongoDB.ObjectId(this._id) }, { $set: { cart: this.cart } });
+        })
+
+    }
+
+    getOrders() {
+        let ordersArray = [];
+        let prodIdArray = new Set();
+        let prodArray = []
+        return db().collection('order').find({ userId: new MongoDB.ObjectId(this._id) }).toArray().then(orders => {
+            ordersArray = [...orders];
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    prodIdArray.add(item.productId);
+                });
+            })
+
+            return db().collection('product').find({ _id: { $in: [...prodIdArray] } }).toArray().then(products => {
+                prodArray = [...products];
+                ordersArray = ordersArray.map(order => {
+                    order.products = order.items.map(item => {
+                        let prod = prodArray.find(x => x._id.toString() === item.productId.toString());
+                        prod.quantity = item.quantity;
+                        return prod;
+                    })
+                    return order;
+                })
+                return ordersArray
+            });
+
+
+        });
+    }
     getCart() {
         if (this.cart) {
             let prodId_array = this.cart.items.map(x => x.productId);
-            return db().collection('product').find({ _id: { $in: prodId_array } }).then(products => {
+            return db().collection('product').find({ _id: { $in: [...prodId_array] } }).toArray().then(products => {
                 return products.map(prod => {
                     prod.quantity = this.cart.items.find(x => x.productId.toString() === prod._id.toString()).quantity;
                     return prod;
